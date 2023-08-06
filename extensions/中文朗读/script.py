@@ -116,7 +116,7 @@ def output_modifier(input_str):
         )
         wav_idx += 1
     except Exception as err:
-        string = f"🤖 ElevenLabs Error: {err}\n\n"
+        string = f"🤖 Error: {err}\n\n"
 
     if params["show_text"]:
         string += f"\n\n{original_string}"
