@@ -101,8 +101,8 @@ def output_modifier(input_str):
     try:
         status, audios, time = vits(
             input_str,
+            0,
             speakers.index(params["selected_voice"]),
-            100,
             vitsNoiseScale,
             vitsNoiseScaleW,
             vitsLengthScale,
