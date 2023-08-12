@@ -1,0 +1,4 @@
+num_beams: 1
+do_sample: true
+top_p: 0.8
+temperature: 0.8
