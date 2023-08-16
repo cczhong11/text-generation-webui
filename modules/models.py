@@ -371,6 +371,20 @@ def llamacpp_loader(model_name):
     return model, tokenizer
 
 
+def chatglmcpp_loader(model_name):
+    import chatglm_cpp
+
+    path = Path(f"{shared.args.model_dir}/{model_name}")
+    if path.is_file():
+        model_file = path
+    else:
+        model_file = list(
+            Path(f"{shared.args.model_dir}/{model_name}").glob("*ggml*.bin")
+        )[0]
+    pipeline = chatglm_cpp.Pipeline(model_file)
+    return pipeline.model, pipeline.tokenizer
+
+
 def GPTQ_loader(model_name):
     # Monkey patch
     if shared.args.monkey_patch:
