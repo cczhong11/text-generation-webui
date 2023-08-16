@@ -170,7 +170,9 @@ def load_tokenizer(model_name, model):
             tokenizer = AutoTokenizer.from_pretrained(
                 path_to_model, trust_remote_code=shared.args.trust_remote_code
             )
-
+        if "qwen" in model_name.lower():
+            tokenizer.eos_token_id = 151643
+            tokenizer.pad_token_id = 151643
     return tokenizer
 
 

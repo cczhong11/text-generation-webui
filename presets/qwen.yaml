@@ -1,0 +1,3 @@
+do_sample: true
+top_k: 0
+top_p: 0.5
