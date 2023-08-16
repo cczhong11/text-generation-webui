@@ -170,7 +170,9 @@ def load_tokenizer(model_name, model):
             tokenizer = AutoTokenizer.from_pretrained(
                 path_to_model, trust_remote_code=shared.args.trust_remote_code
             )
-
+        if "qwen" in model_name.lower():
+            tokenizer.eos_token_id = 151643
+            tokenizer.pad_token_id = 151643
     return tokenizer
 
 
@@ -367,6 +369,20 @@ def llamacpp_loader(model_name):
     logger.info(f"llama.cpp weights detected: {model_file}\n")
     model, tokenizer = LlamaCppModel.from_pretrained(model_file)
     return model, tokenizer
+
+
+def chatglmcpp_loader(model_name):
+    import chatglm_cpp
+
+    path = Path(f"{shared.args.model_dir}/{model_name}")
+    if path.is_file():
+        model_file = path
+    else:
+        model_file = list(
+            Path(f"{shared.args.model_dir}/{model_name}").glob("*ggml*.bin")
+        )[0]
+    pipeline = chatglm_cpp.Pipeline(model_file)
+    return pipeline.model, pipeline.tokenizer
 
 
 def GPTQ_loader(model_name):
