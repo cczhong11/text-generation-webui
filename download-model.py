@@ -130,8 +130,17 @@ class ModelDownloader:
                 is_ggml = re.match(".*ggml.*\.bin", fname)
                 is_tokenizer = re.match("(tokenizer|ice).*\.model", fname)
                 is_text = re.match(".*\.(txt|json|py|md)", fname) or is_tokenizer
+                is_tiktoken = re.match(".*\.tiktoken", fname)
                 if any(
-                    (is_pytorch, is_safetensors, is_pt, is_ggml, is_tokenizer, is_text)
+                    (
+                        is_pytorch,
+                        is_safetensors,
+                        is_pt,
+                        is_ggml,
+                        is_tokenizer,
+                        is_text,
+                        is_tiktoken,
+                    )
                 ):
                     if "lfs" in dict[i]:
                         sha256.append([fname, dict[i]["lfs"]["oid"]])

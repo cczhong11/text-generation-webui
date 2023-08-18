@@ -386,7 +386,7 @@ def chatglmcpp_loader(model_name):
             Path(f"{shared.args.model_dir}/{model_name}").glob("*ggml*.bin")
         )[0]
     pipeline = chatglm_cpp.Pipeline(model_file)
-    return pipeline.model, pipeline.tokenizer
+    return pipeline, pipeline.tokenizer
 
 
 def GPTQ_loader(model_name):
