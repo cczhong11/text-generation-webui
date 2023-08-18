@@ -406,12 +406,13 @@ def generate_reply_custom(
 
             yield reply
         elif shared.model_type == "chatglmcpp":
-            for reply in shared.model.generate(
+            reply = ""
+            for tmpreply in shared.model.generate(
                 prompt=question, stream=True, **generate_params
             ):
                 if not is_chat:
-                    reply = apply_extensions("output", reply)
-
+                    tmpreply = apply_extensions("output", tmpreply)
+                reply += tmpreply
                 yield reply
 
         else:
