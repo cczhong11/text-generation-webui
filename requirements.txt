@@ -15,9 +15,19 @@ sentencepiece
 tqdm
 scipy
 transformers==4.29.1
-bitsandbytes
-llama-cpp-python==0.1.72; platform_system != "Windows"
-https://github.com/PanQiWei/AutoGPTQ/releases/download/v0.2.2/auto_gptq-0.2.2+cu117-cp310-cp310-linux_x86_64.whl; platform_system == "Linux"
+bitsandbytes==0.41.1; platform_system != "Windows"
+https://github.com/jllllll/bitsandbytes-windows-webui/releases/download/wheels/bitsandbytes-0.41.1-py3-none-win_amd64.whl; platform_system == "Windows"
+https://github.com/PanQiWei/AutoGPTQ/releases/download/v0.4.1/auto_gptq-0.4.1+cu117-cp310-cp310-win_amd64.whl; platform_system == "Windows"
+https://github.com/PanQiWei/AutoGPTQ/releases/download/v0.4.1/auto_gptq-0.4.1+cu117-cp310-cp310-linux_x86_64.whl; platform_system == "Linux" and platform_machine == "x86_64"
+https://github.com/jllllll/exllama/releases/download/0.0.10/exllama-0.0.10+cu117-cp310-cp310-win_amd64.whl; platform_system == "Windows"
+https://github.com/jllllll/exllama/releases/download/0.0.10/exllama-0.0.10+cu117-cp310-cp310-linux_x86_64.whl; platform_system == "Linux" and platform_machine == "x86_64"
+
+llama-cpp-python==0.1.77; platform_system != "Windows"
+https://github.com/abetlen/llama-cpp-python/releases/download/v0.1.77/llama_cpp_python-0.1.77-cp310-cp310-win_amd64.whl; platform_system == "Windows"
+# llama-cpp-python with CUDA support
+https://github.com/jllllll/llama-cpp-python-cuBLAS-wheels/releases/download/textgen-webui/llama_cpp_python_cuda-0.1.77+cu117-cp310-cp310-win_amd64.whl; platform_system == "Windows"
+https://github.com/jllllll/llama-cpp-python-cuBLAS-wheels/releases/download/textgen-webui/llama_cpp_python_cuda-0.1.77+cu117-cp310-cp310-linux_x86_64.whl; platform_system == "Linux" and platform_machine == "x86_64"
+
 fastapi==0.95.2
 gradio_client==0.2.5
 gradio==3.33.1
