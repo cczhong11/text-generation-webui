@@ -386,7 +386,7 @@ def generate_reply_custom(
         del generate_params["token_count"]
         del generate_params["repetition_penalty"]
         generate_params["max_context_length"] = state["max_new_tokens"]
-        generate_params["threads"] = shared.args.threads or 1
+        generate_params["num_threads"] = shared.args.threads or 1
 
     t0 = time.time()
     reply = ""
