@@ -60,6 +60,8 @@ def find_model_type(model_name):
     if re.match(".*rwkv.*", model_name_lower):
         return "rwkv"
     elif len(list(path_to_model.glob("*ggml*.bin"))) > 0:
+        if "chatglm" in model_name_lower:
+            return "chatglmcpp"
         return "llamacpp"
     elif re.match(".*ggml.*\.bin", model_name_lower):
         return "llamacpp"
@@ -106,6 +108,8 @@ def load_model(model_name):
         load_func = RWKV_loader
     elif shared.args.flexgen:
         load_func = flexgen_loader
+    elif shared.model_type == "chatglmcpp":
+        load_func = chatglmcpp_loader
     else:
         load_func = huggingface_loader
 
