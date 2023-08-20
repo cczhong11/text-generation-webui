@@ -1,5 +1,5 @@
 """
-Downloads models from Hugging Face to models/model-name.
+Downloads models from Hugging Face to models/username_modelname.
 
 Example:
 python download-model.py facebook/opt-1.3b
@@ -11,73 +11,29 @@ import base64
 import datetime
 import hashlib
 import json
-import re
 import os
+import re
 import sys
 from pathlib import Path
 
 import requests
 import tqdm
+from requests.adapters import HTTPAdapter
 from tqdm.contrib.concurrent import thread_map
 
 
-def select_model_from_default_options():
-    models = {
-        "OPT 6.7B": ("facebook", "opt-6.7b", "main"),
-        "OPT 2.7B": ("facebook", "opt-2.7b", "main"),
-        "OPT 1.3B": ("facebook", "opt-1.3b", "main"),
-        "OPT 350M": ("facebook", "opt-350m", "main"),
-        "GALACTICA 6.7B": ("facebook", "galactica-6.7b", "main"),
-        "GALACTICA 1.3B": ("facebook", "galactica-1.3b", "main"),
-        "GALACTICA 125M": ("facebook", "galactica-125m", "main"),
-        "Pythia-6.9B-deduped": ("EleutherAI", "pythia-6.9b-deduped", "main"),
-        "Pythia-2.8B-deduped": ("EleutherAI", "pythia-2.8b-deduped", "main"),
-        "Pythia-1.4B-deduped": ("EleutherAI", "pythia-1.4b-deduped", "main"),
-        "Pythia-410M-deduped": ("EleutherAI", "pythia-410m-deduped", "main"),
-    }
-
-    choices = {}
-    print("Select the model that you want to download:\n")
-    for i, name in enumerate(models):
-        char = chr(ord("A") + i)
-        choices[char] = name
-        print(f"{char}) {name}")
-
-    char_hugging = chr(ord("A") + len(models))
-    print(f"{char_hugging}) Manually specify a Hugging Face model")
-    char_exit = chr(ord("A") + len(models) + 1)
-    print(f"{char_exit}) Do not download a model")
-    print()
-    print("Input> ", end="")
-    choice = input()[0].strip().upper()
-    if choice == char_exit:
-        exit()
-    elif choice == char_hugging:
-        print(
-            """\nType the name of your desired Hugging Face model in the format organization/name.
-
-Examples:
-facebook/opt-1.3b
-EleutherAI/pythia-1.4b-deduped
-"""
-        )
-
-        print("Input> ", end="")
-        model = input()
-        branch = "main"
-    else:
-        arr = models[choices[choice]]
-        model = f"{arr[0]}/{arr[1]}"
-        branch = arr[2]
-
-    return model, branch
-
-
 class ModelDownloader:
-    def __init__(self):
+    def __init__(self, max_retries=5):
         self.s = requests.Session()
+        if max_retries:
+            self.s.mount(
+                "https://cdn-lfs.huggingface.co", HTTPAdapter(max_retries=max_retries)
+            )
+            self.s.mount("https://huggingface.co", HTTPAdapter(max_retries=max_retries))
         if os.getenv("HF_USER") is not None and os.getenv("HF_PASS") is not None:
             self.s.auth = (os.getenv("HF_USER"), os.getenv("HF_PASS"))
+        if os.getenv("HF_TOKEN") is not None:
+            self.s.headers = {"authorization": f'Bearer {os.getenv("HF_TOKEN")}'}
 
     def sanitize_model_and_branch_names(self, model, branch):
         if model[-1] == "/":
@@ -109,7 +65,7 @@ class ModelDownloader:
         is_lora = False
         while True:
             url = f"{base}{page}" + (f"?cursor={cursor.decode()}" if cursor else "")
-            r = self.s.get(url, timeout=20)
+            r = self.s.get(url, timeout=10)
             r.raise_for_status()
             content = r.content
 
@@ -124,23 +80,14 @@ class ModelDownloader:
                 ):
                     is_lora = True
 
-                is_pytorch = re.match("(pytorch|adapter|gptq)_model.*\.bin", fname)
-                is_safetensors = re.match(".*\.safetensors", fname)
-                is_pt = re.match(".*\.pt", fname)
-                is_ggml = re.match(".*ggml.*\.bin", fname)
-                is_tokenizer = re.match("(tokenizer|ice).*\.model", fname)
-                is_text = re.match(".*\.(txt|json|py|md)", fname) or is_tokenizer
-                is_tiktoken = re.match(".*\.tiktoken", fname)
+                is_pytorch = re.match(r"(pytorch|adapter|gptq)_model.*\.bin", fname)
+                is_safetensors = re.match(r".*\.safetensors", fname)
+                is_pt = re.match(r".*\.pt", fname)
+                is_ggml = re.match(r".*ggml.*\.bin", fname)
+                is_tokenizer = re.match(r"(tokenizer|ice|spiece).*\.model", fname)
+                is_text = re.match(r".*\.(txt|json|py|md)", fname) or is_tokenizer
                 if any(
-                    (
-                        is_pytorch,
-                        is_safetensors,
-                        is_pt,
-                        is_ggml,
-                        is_tokenizer,
-                        is_text,
-                        is_tiktoken,
-                    )
+                    (is_pytorch, is_safetensors, is_pt, is_ggml, is_tokenizer, is_text)
                 ):
                     if "lfs" in dict[i]:
                         sha256.append([fname, dict[i]["lfs"]["oid"]])
@@ -191,42 +138,47 @@ class ModelDownloader:
         output_folder = f"{'_'.join(model.split('/')[-2:])}"
         if branch != "main":
             output_folder += f"_{branch}"
+
         output_folder = Path(base_folder) / output_folder
         return output_folder
 
     def get_single_file(self, url, output_folder, start_from_scratch=False):
         filename = Path(url.rsplit("/", 1)[1])
         output_path = output_folder / filename
+        headers = {}
+        mode = "wb"
         if output_path.exists() and not start_from_scratch:
             # Check if the file has already been downloaded completely
-            r = self.s.get(url, stream=True, timeout=20)
+            r = self.s.get(url, stream=True, timeout=10)
             total_size = int(r.headers.get("content-length", 0))
             if output_path.stat().st_size >= total_size:
                 return
+
             # Otherwise, resume the download from where it left off
             headers = {"Range": f"bytes={output_path.stat().st_size}-"}
             mode = "ab"
-        else:
-            headers = {}
-            mode = "wb"
 
-        r = self.s.get(url, stream=True, headers=headers, timeout=20)
-        with open(output_path, mode) as f:
+        with self.s.get(url, stream=True, headers=headers, timeout=10) as r:
+            r.raise_for_status()  # Do not continue the download if the request was unsuccessful
             total_size = int(r.headers.get("content-length", 0))
-            block_size = 1024 * 1024
-            downloaded_size = 0
-        i = 0
-        for data in r.iter_content(block_size):
-            downloaded_size += len(data)
-            percent_completed = downloaded_size / total_size * 100 if total_size else 0
-            if i % 10 == 0
-                # 打印进度信息
-                print(
-                    f"\r下载进度：{downloaded_size} / {total_size} bytes ({percent_completed:.2f}%)",
-                    end="",
-                )
-            i += 1
-            f.write(data)
+            block_size = 1024 * 1024  # 1MB
+            with open(output_path, mode) as f:
+                with tqdm.tqdm(
+                    total=total_size,
+                    unit="iB",
+                    unit_scale=True,
+                    bar_format="{l_bar}{bar}| {n_fmt:6}/{total_fmt:6} {rate_fmt:6}",
+                ) as t:
+                    count = 0
+                    for data in r.iter_content(block_size):
+                        t.update(len(data))
+                        f.write(data)
+                        if total_size != 0 and self.progress_bar is not None:
+                            count += len(data)
+                            self.progress_bar(
+                                float(count) / float(total_size),
+                                f"Downloading {filename}",
+                            )
 
     def start_download_threads(
         self, file_list, output_folder, start_from_scratch=False, threads=1
@@ -247,23 +199,26 @@ class ModelDownloader:
         links,
         sha256,
         output_folder,
+        progress_bar=None,
         start_from_scratch=False,
         threads=1,
     ):
+        self.progress_bar = progress_bar
+
         # Creating the folder and writing the metadata
-        if not output_folder.exists():
-            output_folder.mkdir(parents=True, exist_ok=True)
-        with open(output_folder / "huggingface-metadata.txt", "w") as f:
-            f.write(f"url: https://huggingface.co/{model}\n")
-            f.write(f"branch: {branch}\n")
-            f.write(
-                f'download date: {str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))}\n'
-            )
-            sha256_str = ""
-            for i in range(len(sha256)):
-                sha256_str += f"    {sha256[i][1]} {sha256[i][0]}\n"
-            if sha256_str != "":
-                f.write(f"sha256sum:\n{sha256_str}")
+        output_folder.mkdir(parents=True, exist_ok=True)
+        metadata = (
+            f"url: https://huggingface.co/{model}\n"
+            f"branch: {branch}\n"
+            f'download date: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n'
+        )
+
+        sha256_str = "\n".join([f"    {item[1]} {item[0]}" for item in sha256])
+        if sha256_str:
+            metadata += f"sha256sum:\n{sha256_str}"
+
+        metadata += "\n"
+        (output_folder / "huggingface-metadata.txt").write_text(metadata)
 
         # Downloading the files
         print(f"Downloading the model to {output_folder}")
@@ -329,14 +284,24 @@ if __name__ == "__main__":
     parser.add_argument(
         "--check", action="store_true", help="Validates the checksums of model files."
     )
+    parser.add_argument(
+        "--max-retries",
+        type=int,
+        default=5,
+        help="Max retries count when get error in download time.",
+    )
     args = parser.parse_args()
 
     branch = args.branch
     model = args.MODEL
-    if model is None:
-        model, branch = select_model_from_default_options()
 
-    downloader = ModelDownloader()
+    if model is None:
+        print(
+            "Error: Please specify the model you'd like to download (e.g. 'python download-model.py facebook/opt-1.3b')."
+        )
+        sys.exit()
+
+    downloader = ModelDownloader(max_retries=args.max_retries)
     # Cleaning up the model/branch names
     try:
         model, branch = downloader.sanitize_model_and_branch_names(model, branch)
