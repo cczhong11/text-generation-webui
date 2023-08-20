@@ -14,7 +14,7 @@ safetensors==0.3.1
 sentencepiece
 tqdm
 scipy
-transformers==4.29.1
+transformers==4.31.0
 bitsandbytes==0.41.1; platform_system != "Windows"
 https://github.com/jllllll/bitsandbytes-windows-webui/releases/download/wheels/bitsandbytes-0.41.1-py3-none-win_amd64.whl; platform_system == "Windows"
 https://github.com/PanQiWei/AutoGPTQ/releases/download/v0.4.1/auto_gptq-0.4.1+cu117-cp310-cp310-win_amd64.whl; platform_system == "Windows"
@@ -31,6 +31,6 @@ tiktoken
 fastapi==0.95.2
 gradio_client==0.2.5
 gradio==3.33.1
-rwkv; platform_system != "Windows"
+rwkv
 transformers_stream_generator
 chatglm-cpp

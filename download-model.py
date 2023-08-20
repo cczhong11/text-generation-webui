@@ -213,16 +213,20 @@ class ModelDownloader:
         r = self.s.get(url, stream=True, headers=headers, timeout=20)
         with open(output_path, mode) as f:
             total_size = int(r.headers.get("content-length", 0))
-            block_size = 1024
-            with tqdm.tqdm(
-                total=total_size,
-                unit="iB",
-                unit_scale=True,
-                bar_format="{l_bar}{bar}| {n_fmt:6}/{total_fmt:6} {rate_fmt:6}",
-            ) as t:
-                for data in r.iter_content(block_size):
-                    t.update(len(data))
-                    f.write(data)
+            block_size = 1024 * 1024
+            downloaded_size = 0
+        i = 0
+        for data in r.iter_content(block_size):
+            downloaded_size += len(data)
+            percent_completed = downloaded_size / total_size * 100 if total_size else 0
+            if i % 10 == 0
+                # 打印进度信息
+                print(
+                    f"\r下载进度：{downloaded_size} / {total_size} bytes ({percent_completed:.2f}%)",
+                    end="",
+                )
+            i += 1
+            f.write(data)
 
     def start_download_threads(
         self, file_list, output_folder, start_from_scratch=False, threads=1
