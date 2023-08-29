@@ -85,7 +85,7 @@ class ModelDownloader:
                 is_pt = re.match(r".*\.pt", fname)
                 is_ggml = re.match(r".*ggml.*\.bin", fname)
                 is_tokenizer = re.match(r"(tokenizer|ice|spiece).*\.model", fname)
-                is_text = re.match(r".*\.(txt|json|py|md)", fname) or is_tokenizer
+                is_text = re.match(r".*\.(txt|json|py|md|tiktoken)", fname) or is_tokenizer
                 if any(
                     (is_pytorch, is_safetensors, is_pt, is_ggml, is_tokenizer, is_text)
                 ):
