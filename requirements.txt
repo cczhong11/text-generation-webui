@@ -33,4 +33,5 @@ gradio_client==0.2.5
 gradio==3.33.1
 rwkv
 transformers_stream_generator
-chatglm-cpp
+https://github.com/cczhong11/chatglm.cpp/releases/download/0.1/chatglm_cpp-0.2.6-cp310-cp310-win_amd64.whl; platform_system == "Windows"
+chatglm-cpp; platform_system != "Windows"
