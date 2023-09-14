@@ -61,7 +61,9 @@ def get_text(text, hps):
     return text_norm, clean_text
 
 
-def vits(text, language, speaker_id, noise_scale, noise_scale_w, length_scale):
+def vits(
+    text, language, speaker_id, noise_scale, noise_scale_w, length_scale, sample_rate
+):
     start = time.perf_counter()
     if not len(text):
         return "输入文本不能为空！", None, None
@@ -93,7 +95,11 @@ def vits(text, language, speaker_id, noise_scale, noise_scale_w, length_scale):
             .numpy()
         )
 
-    return "生成成功!", (22050, audio), f"生成耗时 {round(time.perf_counter()-start, 2)} s"
+    return (
+        "生成成功!",
+        (sample_rate, audio),
+        f"生成耗时 {round(time.perf_counter()-start, 2)} s",
+    )
 
 
 if not _init_vits_model:
