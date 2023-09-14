@@ -23,7 +23,11 @@ wav_idx = 0
 
 
 def refresh_voices():
-    return speakers
+    try:
+        a = speakers[0]
+        return speakers
+    except:
+        return list(speakers.keys())
 
 
 def refresh_voices_dd():
@@ -99,10 +103,15 @@ def output_modifier(input_str):
     output_file = Path(f"extensions/中文朗读/outputs/{wav_idx:06d}.wav".format(wav_idx))
     print(f"Outputting audio to {str(output_file)}")
     try:
+        a = speakers[0]
+        sid = speakers.index(params["selected_voice"])
+    except:
+        sid = speakers[params["selected_voice"]]
+    try:
         status, audios, time = vits(
             input_str,
             0,
-            speakers.index(params["selected_voice"]),
+            sid,
             vitsNoiseScale,
             vitsNoiseScaleW,
             vitsLengthScale,
