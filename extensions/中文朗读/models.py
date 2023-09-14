@@ -1,3 +1,4 @@
+import copy
 import math
 import torch
 from torch import nn
@@ -8,7 +9,7 @@ import extensions.中文朗读.modules as modules
 import extensions.中文朗读.attentions as attentions
 import extensions.中文朗读.monotonic_align as monotonic_align
 
-from torch.nn import Conv1d, ConvTranspose1d, Conv2d
+from torch.nn import Conv1d, ConvTranspose1d, AvgPool1d, Conv2d
 from torch.nn.utils import weight_norm, remove_weight_norm, spectral_norm
 from extensions.中文朗读.commons import init_weights, get_padding
 
@@ -603,7 +604,7 @@ class SynthesizerTrn(nn.Module):
                 hidden_channels, 256, 3, 0.5, gin_channels=gin_channels
             )
 
-        if n_speakers > 1:
+        if n_speakers >= 1:
             self.emb_g = nn.Embedding(n_speakers, gin_channels)
 
     def forward(self, x, x_lengths, y, y_lengths, sid=None):
