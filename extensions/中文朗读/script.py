@@ -9,6 +9,7 @@ from extensions.中文朗读.vits import (
     vitsNoiseScaleW,
     vitsLengthScale,
     speakers,
+    hps_ms,
 )
 
 params = {
@@ -115,6 +116,7 @@ def output_modifier(input_str):
             vitsNoiseScale,
             vitsNoiseScaleW,
             vitsLengthScale,
+            hps_ms.data.sampling_rate,
         )
         print("VITS : ", status, time)
         wavfile.write(output_file, audios[0], audios[1])
