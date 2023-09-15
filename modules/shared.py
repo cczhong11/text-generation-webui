@@ -316,6 +316,11 @@ parser.add_argument(
     action="store_true",
     help="For models that don't have a quantize_config.json, this parameter is used to define whether to set desc_act or not in BaseQuantizeConfig.",
 )
+parser.add_argument(
+    "--disable_exllama",
+    action="store_true",
+    help="Disable ExLlama kernel, which can improve inference speed on some systems.",
+)
 
 # FlexGen
 parser.add_argument(
