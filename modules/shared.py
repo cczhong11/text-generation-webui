@@ -309,8 +309,22 @@ parser.add_argument(
     action="store_true",
     help="Use GPTQ-for-LLaMa to load the GPTQ model instead of AutoGPTQ.",
 )
-parser.add_argument("--autogptq", action="store_true", help="DEPRECATED")
 parser.add_argument("--triton", action="store_true", help="Use triton.")
+parser.add_argument(
+    "--no_inject_fused_attention",
+    action="store_true",
+    help="Do not use fused attention (lowers VRAM requirements).",
+)
+parser.add_argument(
+    "--no_inject_fused_mlp",
+    action="store_true",
+    help="Triton mode only: Do not use fused MLP (lowers VRAM requirements).",
+)
+parser.add_argument(
+    "--no_use_cuda_fp16",
+    action="store_true",
+    help="This can make models faster on some systems.",
+)
 parser.add_argument(
     "--desc_act",
     action="store_true",

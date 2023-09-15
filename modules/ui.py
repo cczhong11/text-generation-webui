@@ -5,116 +5,42 @@ import torch
 
 from modules import shared
 
-with open(Path(__file__).resolve().parent / "../css/main.css", "r") as f:
+with open(Path(__file__).resolve().parent / '../css/main.css', 'r') as f:
     css = f.read()
-with open(Path(__file__).resolve().parent / "../css/chat.css", "r") as f:
+with open(Path(__file__).resolve().parent / '../css/chat.css', 'r') as f:
     chat_css = f.read()
-with open(Path(__file__).resolve().parent / "../css/main.js", "r") as f:
+with open(Path(__file__).resolve().parent / '../css/main.js', 'r') as f:
     main_js = f.read()
-with open(Path(__file__).resolve().parent / "../css/chat.js", "r") as f:
+with open(Path(__file__).resolve().parent / '../css/chat.js', 'r') as f:
     chat_js = f.read()
 
-refresh_symbol = "\U0001f504"  # 🔄
-delete_symbol = "🗑️"
-save_symbol = "💾"
+refresh_symbol = '\U0001f504'  # 🔄
+delete_symbol = '🗑️'
+save_symbol = '💾'
 
 theme = gr.themes.Default(
-    font=["Helvetica", "ui-sans-serif", "system-ui", "sans-serif"],
-    font_mono=["IBM Plex Mono", "ui-monospace", "Consolas", "monospace"],
+    font=['Helvetica', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+    font_mono=['IBM Plex Mono', 'ui-monospace', 'Consolas', 'monospace'],
 ).set(
-    border_color_primary="#c5c5d2",
-    button_large_padding="6px 12px",
-    body_text_color_subdued="#484848",
-    background_fill_secondary="#eaeaea",
+    border_color_primary='#c5c5d2',
+    button_large_padding='6px 12px',
+    body_text_color_subdued='#484848',
+    background_fill_secondary='#eaeaea'
 )
 
 
 def list_model_elements():
-    elements = [
-        "cpu_memory",
-        "auto_devices",
-        "disk",
-        "cpu",
-        "bf16",
-        "load_in_8bit",
-        "trust_remote_code",
-        "load_in_4bit",
-        "compute_dtype",
-        "quant_type",
-        "use_double_quant",
-        "gptq_for_llama",
-        "wbits",
-        "groupsize",
-        "model_type",
-        "pre_layer",
-        "triton",
-        "desc_act",
-        "threads",
-        "n_batch",
-        "no_mmap",
-        "mlock",
-        "n_gpu_layers",
-        "n_ctx",
-        "llama_cpp_seed",
-        "disable_exllama",
-    ]
+    elements = ['cpu_memory', 'auto_devices', 'disk', 'cpu', 'bf16', 'load_in_8bit', 'trust_remote_code', 'load_in_4bit', 'compute_dtype', 'quant_type', 'use_double_quant', 'gptq_for_llama', 'wbits', 'groupsize', 'model_type', 'pre_layer', 'triton', 'desc_act', 'threads', 'n_batch', 'no_mmap', 'mlock', 'n_gpu_layers', 'n_ctx', 'llama_cpp_seed']
     for i in range(torch.cuda.device_count()):
-        elements.append(f"gpu_memory_{i}")
+        elements.append(f'gpu_memory_{i}')
 
     return elements
 
 
 def list_interface_input_elements(chat=False):
-    elements = [
-        "max_new_tokens",
-        "seed",
-        "temperature",
-        "top_p",
-        "top_k",
-        "typical_p",
-        "epsilon_cutoff",
-        "eta_cutoff",
-        "repetition_penalty",
-        "encoder_repetition_penalty",
-        "no_repeat_ngram_size",
-        "min_length",
-        "do_sample",
-        "penalty_alpha",
-        "num_beams",
-        "length_penalty",
-        "early_stopping",
-        "mirostat_mode",
-        "mirostat_tau",
-        "mirostat_eta",
-        "add_bos_token",
-        "ban_eos_token",
-        "truncation_length",
-        "custom_stopping_strings",
-        "skip_special_tokens",
-        "preset_menu",
-        "stream",
-        "tfs",
-        "top_a",
-    ]
+    elements = ['max_new_tokens', 'seed', 'temperature', 'top_p', 'top_k', 'typical_p', 'epsilon_cutoff', 'eta_cutoff', 'repetition_penalty', 'encoder_repetition_penalty', 'no_repeat_ngram_size', 'min_length', 'do_sample', 'penalty_alpha', 'num_beams', 'length_penalty', 'early_stopping', 'mirostat_mode', 'mirostat_tau', 'mirostat_eta', 'add_bos_token', 'ban_eos_token', 'truncation_length', 'custom_stopping_strings', 'skip_special_tokens', 'preset_menu', 'stream', 'tfs', 'top_a']
     if chat:
-        elements += [
-            "name1",
-            "name2",
-            "greeting",
-            "context",
-            "chat_prompt_size",
-            "chat_generation_attempts",
-            "stop_at_newline",
-            "mode",
-            "instruction_template",
-            "character_menu",
-            "name1_instruct",
-            "name2_instruct",
-            "context_instruct",
-            "turn_template",
-            "chat_style",
-            "chat-instruct_command",
-        ]
+        elements += ['name1', 'name2', 'greeting', 'context', 'chat_prompt_size', 'chat_generation_attempts', 'stop_at_newline', 'mode', 'instruction_template', 'character_menu', 'name1_instruct', 'name2_instruct', 'context_instruct', 'turn_template', 'chat_style', 'chat-instruct_command']
 
     elements += list_model_elements()
     return elements
@@ -161,7 +87,11 @@ def create_refresh_button(refresh_component, refresh_method, refreshed_args, ele
         return gr.update(**(args or {}))
 
     refresh_button = ToolButton(value=refresh_symbol, elem_id=elem_id)
-    refresh_button.click(fn=refresh, inputs=[], outputs=[refresh_component])
+    refresh_button.click(
+        fn=refresh,
+        inputs=[],
+        outputs=[refresh_component]
+    )
     return refresh_button
 
 
