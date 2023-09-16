@@ -14,11 +14,11 @@ safetensors==0.3.1
 sentencepiece
 tqdm
 scipy
-transformers==4.31.0
+transformers==4.33.1
 bitsandbytes==0.41.1; platform_system != "Windows"
 https://github.com/jllllll/bitsandbytes-windows-webui/releases/download/wheels/bitsandbytes-0.41.1-py3-none-win_amd64.whl; platform_system == "Windows"
-https://github.com/PanQiWei/AutoGPTQ/releases/download/v0.4.1/auto_gptq-0.4.1+cu117-cp310-cp310-win_amd64.whl; platform_system == "Windows"
-https://github.com/PanQiWei/AutoGPTQ/releases/download/v0.4.1/auto_gptq-0.4.1+cu117-cp310-cp310-linux_x86_64.whl; platform_system == "Linux" and platform_machine == "x86_64"
+https://github.com/PanQiWei/AutoGPTQ/releases/download/v0.4.2/auto_gptq-0.4.2+cu117-cp310-cp310-win_amd64.whl; platform_system == "Windows"
+https://github.com/PanQiWei/AutoGPTQ/releases/download/v0.4.2/auto_gptq-0.4.2+cu117-cp310-cp310-linux_x86_64.whl; platform_system == "Linux" and platform_machine == "x86_64"
 https://github.com/jllllll/exllama/releases/download/0.0.10/exllama-0.0.10+cu117-cp310-cp310-win_amd64.whl; platform_system == "Windows"
 https://github.com/jllllll/exllama/releases/download/0.0.10/exllama-0.0.10+cu117-cp310-cp310-linux_x86_64.whl; platform_system == "Linux" and platform_machine == "x86_64"
 
@@ -35,3 +35,4 @@ rwkv
 transformers_stream_generator
 https://github.com/cczhong11/chatglm.cpp/releases/download/0.1/chatglm_cpp-0.2.6-cp310-cp310-win_amd64.whl; platform_system == "Windows"
 chatglm-cpp; platform_system != "Windows"
+optimum==1.12.0

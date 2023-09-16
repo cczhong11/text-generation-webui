@@ -459,12 +459,6 @@ parser.add_argument(
 args = parser.parse_args()
 args_defaults = parser.parse_args([])
 
-# Deprecation warnings
-if args.autogptq:
-    logger.warning(
-        "--autogptq has been deprecated and will be removed soon. AutoGPTQ is now used by default for GPTQ models."
-    )
-
 # Security warnings
 if args.trust_remote_code:
     logger.warning("trust_remote_code is enabled. This is dangerous.")
